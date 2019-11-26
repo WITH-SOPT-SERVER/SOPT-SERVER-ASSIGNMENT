@@ -36,7 +36,8 @@ router.get('/:commentIdx', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    const { blogIdx: articleIdx, writer, content } = req.body;
+    const { articleIdx } = req.params;
+    const {  writer, content } = req.body;
     if(!articleIdx || !writer || !content) throw new ParameterError();
     Comment.create({articleIdx, writer, content})
     .then(result => {

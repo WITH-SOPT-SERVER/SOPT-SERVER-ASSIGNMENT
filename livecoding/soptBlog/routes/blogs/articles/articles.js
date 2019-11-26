@@ -36,7 +36,8 @@ router.get('/:articleIdx', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    const { blogIdx, title, content } = req.body;
+    const { blogIdx } = req.params;
+    const { title, content } = req.body;
     if(!blogIdx || !title || !content) throw new ParameterError();
     Article.create({blogIdx, title, content})
     .then(result => {

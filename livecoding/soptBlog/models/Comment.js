@@ -28,9 +28,9 @@ module.exports = {
         return result;
     },
     create: async (json) => {
-        const query = `INSERT ${TABLE_NAME}(${Object.keys(json).join(', ')}) VALUES(?, ?)`;
-        const values = Object.entries(json).map(it => it[1]);
-        const result = await pool.queryParam_Parse(query, values);
+        const query = `INSERT ${TABLE_NAME}(${Object.keys(json).join(', ')}) ` + 
+                    `VALUES(${Object.entries(json).map(it => it[1]).join(',')})`;
+        const result = await pool.queryParam_None(query);
         return result;
     },
     update: async (commentIdx, json) => {
