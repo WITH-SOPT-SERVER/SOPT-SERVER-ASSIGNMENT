@@ -1,5 +1,5 @@
 const poolPromise = require('../../config/dbConfig');
-const { DatabaseError } = require('../../errors');
+const { DatabaseError, NoReferencedRowError } = require('../../errors');
 
 module.exports = {
     queryParam_None: async (query) => {
@@ -8,16 +8,22 @@ module.exports = {
             const pool = await poolPromise;
             const connection = await pool.getConnection();
             try {
-                result = await connection.query(query) || null;
+                result = await connection.query(query);
             } catch (queryError) {
                 connection.rollback(() => {});
+                if(queryError.errno == 1452) {
+                    result = new NoReferencedRowError();
+                }
                 console.log(queryError);
             }
             pool.releaseConnection(connection);
         } catch (connectionError) {
             console.log(connectionError);
         }
-        if(!result){
+        if(result instanceof Error) {
+            throw result;
+        }
+        if(!result) {
             throw new DatabaseError();
         }
         return result;
@@ -34,13 +40,19 @@ module.exports = {
                 result = await connection.query(query, value) || null;
             } catch (queryError) {
                 connection.rollback(() => {});
+                if(queryError.errno == 1452) {
+                    result = new NoReferencedRowError();
+                }
                 console.log(queryError);
             }
             pool.releaseConnection(connection);
         } catch (connectionError) {
             console.log(connectionError);
         }
-        if(!result){
+        if(result instanceof Error) {
+            throw result;
+        }
+        if(!result) {
             throw new DatabaseError();
         }
         return result;
@@ -64,7 +76,10 @@ module.exports = {
             console.log(connectionError);
             result = false;
         }
-        if(!result){
+        if(result instanceof Error) {
+            throw result;
+        }
+        if(!result) {
             throw new DatabaseError();
         }
         return result;
