@@ -3,5 +3,6 @@ module.exports = {
     DatabaseError: require('./DatabaseError'),
     NoReferencedRowError: require('./NoReferencedRowError'),
     NotMatchedError: require('./NotMatchedError'),
-    AuthorizationError: require('./AuthorizationError')
+    AuthorizationError: require('./AuthorizationError'),
+    TokenExpiredError: require('./TokenExpiredError'),
 };
