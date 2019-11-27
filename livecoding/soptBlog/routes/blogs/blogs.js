@@ -21,7 +21,8 @@ router.get('/', async (req, res) => {
 router.get('/:blogIdx', (req, res) => {
     const { blogIdx } = req.params;
     if(!blogIdx) throw new ParameterError();
-    Blog.readByIdx(blogIdx)
+    // Blog.readByIdx(blogIdx)
+    Blog.readWhere({blogIdx})
     .then(result => {
         res.status(status.OK)
         .send(util.successTrue(message.X_READ_SUCCESS(NAME), result));

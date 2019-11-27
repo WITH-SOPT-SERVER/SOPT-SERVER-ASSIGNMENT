@@ -15,13 +15,16 @@ module.exports = {
     readByIdx: async (commentIdx) => {
         const query = `SELECT * FROM ${TABLE_NAME} WHERE commentIdx = ?`;
         const values = [commentIdx];
-        return pool.queryParam_Parse(query, values);
+        const result = await pool.queryParam_Parse(query, values);
+        return result[0];
     },
     readWhere: async (where) => {
-        const query = `SELECT * FROM ${TABLE_NAME} `+
-        where ? ' WHERE ' + Object.entries(where)
-            .map(it => `${it[0]} = '${it[1]}'`)
-            .join(' ') : '';
+        const entry = Object.entries(where).filter(it => it[1] != '*');
+        const query = `SELECT * FROM ${TABLE_NAME} ` + 
+            (entry.length > 0 ? ' WHERE ' + entry
+                .filter(it => it[1] != '*')
+                .map(it => `${it[0]} = '${it[1]}'`)
+                .join(' ') : '');
         return pool.queryParam_None(query);
     },
     create: (json) => {

@@ -7,16 +7,17 @@ module.exports = {
         const query = `SELECT * FROM ${TABLE_NAME}`;
         return pool.queryParam_Parse(query);
     },
-    readByIdx: (blogIdx) => {
+    readByIdx: async (blogIdx) => {
         const query = `SELECT * FROM ${TABLE_NAME} WHERE blogIdx = ?`;
         const values = [blogIdx];
-        return pool.queryParam_Parse(query, values);
+        const result = await pool.queryParam_Parse(query, values);
+        return result[0];
     },
     readWhere: (where) => {
-        const query = `SELECT * FROM ${TABLE_NAME} `+
-        where ? ' WHERE ' + Object.entries(where)
-            .map(it => `${it[0]} = '${it[1]}'`)
-            .join(' ') : '';
+        const entry = Object.entries(where).filter(it => it[1] != '*');
+        const query = `SELECT * FROM ${TABLE_NAME} ` + (entry.length > 0 ? ' WHERE ' + entry
+                .map(it => `${it[0]} = '${it[1]}'`)
+                .join(' AND ') : '');
         return pool.queryParam_None(query);
     },
     create: (json) => {

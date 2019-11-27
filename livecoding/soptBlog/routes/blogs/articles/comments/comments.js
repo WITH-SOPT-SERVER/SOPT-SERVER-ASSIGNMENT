@@ -8,7 +8,8 @@ const NAME = '댓글'
 router.get('/', async (req, res) => {
     const { articleIdx } = req.params;
     if(!articleIdx) throw new ParameterError();
-    Comment.readByArticleIdx(articleIdx)
+    // Comment.readByArticleIdx(articleIdx)
+    Comment.readWhere({articleIdx})
     .then(result => {
         res.status(status.OK)
         .send(util.successTrue(message.X_READ_SUCCESS(NAME), result));
@@ -23,7 +24,8 @@ router.get('/', async (req, res) => {
 router.get('/:commentIdx', (req, res) => {
     const { commentIdx } = req.params;
     if(!commentIdx) throw new ParameterError();
-    Comment.readByIdx(commentIdx)
+    // Comment.readByIdx(commentIdx)
+    Comment.readWhere({commentIdx})
     .then(result => {
         res.status(status.OK)
         .send(util.successTrue(message.X_READ_SUCCESS(NAME), result));

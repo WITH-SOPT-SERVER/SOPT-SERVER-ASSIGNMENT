@@ -8,7 +8,8 @@ const NAME = '게시글'
 router.get('/', async (req, res) => {
     const { blogIdx } = req.params;
     if(!blogIdx) throw new ParameterError();
-    Article.readByBlogIdx(blogIdx)
+    // Article.readByBlogIdx(blogIdx)
+    Article.readWhere({blogIdx})
     .then(result => {
         res.status(status.OK)
         .send(util.successTrue(message.X_READ_SUCCESS(NAME), result));
@@ -23,7 +24,8 @@ router.get('/', async (req, res) => {
 router.get('/:articleIdx', (req, res) => {
     const { articleIdx } = req.params;
     if(!articleIdx) throw new ParameterError();
-    Article.readByIdx(articleIdx)
+    // Article.readByIdx(articleIdx)
+    Article.readWhere({articleIdx})
     .then(result => {
         res.status(status.OK)
         .send(util.successTrue(message.X_READ_SUCCESS(NAME), result));

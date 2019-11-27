@@ -12,16 +12,19 @@ module.exports = {
         const values = [blogIdx];
         return pool.queryParam_Parse(query, values);
     },
-    readByIdx: (articleIdx) => {
+    readByIdx: async (articleIdx) => {
         const query = `SELECT * FROM ${TABLE_NAME} WHERE articleIdx = ?`;
         const values = [articleIdx];
-        return pool.queryParam_Parse(query, values);
+        const result = await pool.queryParam_Parse(query, values);
+        return result[0];
     },
     readWhere: (where) => {
-        const query = `SELECT * FROM ${TABLE_NAME} `+
-        where ? ' WHERE ' + Object.entries(where)
-            .map(it => `${it[0]} = '${it[1]}'`)
-            .join(' ') : '';
+        const entry = Object.entries(where).filter(it => it[1] != '*');
+        const query = `SELECT * FROM ${TABLE_NAME} ` + 
+            (entry.length > 0 ? ' WHERE ' + entry
+                .filter(it => it[1] != '*')
+                .map(it => `${it[0]} = '${it[1]}'`)
+                .join(' ') : '');
         return pool.queryParam_None(query);
     },
     create: (json) => {
