@@ -18,5 +18,7 @@ module.exports = {
     MISS_MATCH_PW: "비밀번호가 일치하지 않습니다",
 
     INTERNAL_SERVER_ERROR: "서버 내부 오류",
-    DB_ERROR: "디비 내부 오류"
+    DB_ERROR: "디비 내부 오류",
+    DB_REFERENCE_ERROR: "잘못된 외래키입니다.",
+    DB_NOT_MATCHED_ERROR: "해당 조건에 일치하는 데이터가 없습니다."
 }
