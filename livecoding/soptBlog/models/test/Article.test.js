@@ -3,7 +3,7 @@ const Blog = require('../Blog');
 
 module.exports = async () => {
     await Article.readAll();
-    const blogIdx = (await Blog.readAll())[0].blogIdx;;
+    const blogIdx = (await Blog.readAll())[0].blogIdx;
     const title = 'title test';
     const content = 'content test';
     const result = await Article.create({blogIdx, title, content});
