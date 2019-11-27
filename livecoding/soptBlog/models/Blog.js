@@ -20,9 +20,9 @@ module.exports = {
         return pool.queryParam_None(query);
     },
     create: (json) => {
-        const query = `INSERT ${TABLE_NAME}(${Object.keys(json).join(', ')}) VALUES(?, ?)`;
-        const values = Object.entries(json).map(it => it[1]);
-        return pool.queryParam_Parse(query, values);
+        const query = `INSERT ${TABLE_NAME}(${Object.keys(json).join(', ')}) ` +
+        'VALUES(' + Object.entries(json).map(it => `'${it[1]}'`) +')';
+        return pool.queryParam_None(query);
     },
     update: async (blogIdx, json) => {
         const query = `UPDATE ${TABLE_NAME}`
