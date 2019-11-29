@@ -1,11 +1,11 @@
 const pool = require('../modules/db/pool');
-const { NotMatchedError } = require('../errors')
+const { NotMatchedError } = require('../errors');
 
 const TABLE_NAME = 'comment';
 module.exports = {
-    readAll: async () => {
+    readAll: () => {
         const query = `SELECT * FROM ${TABLE_NAME}`;
-        return await pool.queryParam_Parse(query);
+        return pool.queryParam_Parse(query);
     },
     readByArticleIdx: async (articleIdx) => {
         const query = `SELECT * FROM ${TABLE_NAME} WHERE articleIdx = ?`;
