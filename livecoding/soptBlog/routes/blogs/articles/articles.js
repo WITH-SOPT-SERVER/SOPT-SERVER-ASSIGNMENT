@@ -1,8 +1,11 @@
 const express = require('express');
 const router = express.Router({mergeParams: true});
+
 const {util, status, message} = require('../../../modules/utils');
-const Article = require('../../../models/Article');
 const { ParameterError } = require('../../../errors');
+const upload = require('../../../config/multer');
+
+const Article = require('../../../models/Article');
 
 const NAME = '게시글'
 router.get('/', async (req, res) => {
@@ -37,11 +40,12 @@ router.get('/:articleIdx', (req, res) => {
     });
 });
 
-router.post('/', (req, res) => {
+router.post('/', upload.single('image'), (req, res) => {
     const { blogIdx } = req.params;
     const { title, content } = req.body;
+    const imageUrl = (req.file || {location: null}).location || '';
     if(!blogIdx || !title || !content) throw new ParameterError();
-    Article.create({blogIdx, title, content})
+    Article.create({blogIdx, title, content, imageUrl})
     .then(result => {
         const insertId = result.insertId;
         res.status(status.OK)
@@ -54,9 +58,10 @@ router.post('/', (req, res) => {
     });
 });
 
-router.put('/:articleIdx', (req, res) => {
+router.put('/:articleIdx', upload.single('image'), (req, res) => {
     const { articleIdx } = req.params;
     const json = req.body;
+    if(req.file) json.imageUrl = req.file.location;
     if(!articleIdx || Object.keys(json).length == 0) throw new ParameterError();
     Article.update(articleIdx, json)
     .then(result => {
