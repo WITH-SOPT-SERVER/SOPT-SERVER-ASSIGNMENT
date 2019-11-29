@@ -5,4 +5,5 @@ module.exports = {
     NotMatchedError: require('./NotMatchedError'),
     AuthorizationError: require('./AuthorizationError'),
     TokenExpiredError: require('./TokenExpiredError'),
+    DuplicatedEntryError: require('./DuplicatedEntryError'),
 };
