@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router({mergeParams: true});
 const {util, status, message} = require('../../modules/utils');
 const Blog = require('../../models/Blog');
-const { ParameterError } = require('../../errors');
+const { ParameterError, NotMatchedError } = require('../../errors');
 
 const NAME = '블로그'
 router.get('/', async (req, res) => {
@@ -28,7 +28,7 @@ router.get('/:blogIdx', (req, res) => {
         .send(util.successTrue(message.X_READ_SUCCESS(NAME), result));
     })
     .catch(err => {
-        console.log(err);    
+        console.log(err);
         res.status(err.status || 500);
         res.send(util.successFalse(err.message));
     });
@@ -56,10 +56,10 @@ router.put('/:blogIdx', (req, res) => {
     if(!blogIdx || Object.keys(json).length == 0) throw new ParameterError();
     Blog.update(blogIdx, json)
     .then(result => {
-        console.log(result);
         const affectedRows = result.affectedRows;
+        if(affectedRows == 0) throw new NotMatchedError();
         res.status(status.OK)
-        .send(util.successTrue(message.X_UPDATE_SUCCESS(NAME), {affectedRows}));
+        .send(util.successTrue(message.X_UPDATE_SUCCESS(NAME)));
     })
     .catch(err => {
         console.log(err);    
@@ -73,10 +73,10 @@ router.delete('/:blogIdx', (req, res) => {
     if(!blogIdx) throw new ParameterError();
     Blog.delete(blogIdx)
     .then(result => {
-        console.log(result);
         const affectedRows = result.affectedRows;
+        if(affectedRows == 0) throw new NotMatchedError();
         res.status(status.OK)
-        .send(util.successTrue(message.X_DELETE_SUCCESS(NAME), {affectedRows}));
+        .send(util.successTrue(message.X_DELETE_SUCCESS(NAME)));
     })
     .catch(err => {
         console.log(err);    

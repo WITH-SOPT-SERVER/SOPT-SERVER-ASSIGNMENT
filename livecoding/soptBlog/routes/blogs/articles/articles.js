@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router({mergeParams: true});
 
 const {util, status, message} = require('../../../modules/utils');
-const { ParameterError } = require('../../../errors');
+const { ParameterError, NotMatchedError } = require('../../../errors');
 const upload = require('../../../config/multer');
 
 const Article = require('../../../models/Article');
@@ -65,10 +65,10 @@ router.put('/:articleIdx', upload.single('image'), (req, res) => {
     if(!articleIdx || Object.keys(json).length == 0) throw new ParameterError();
     Article.update(articleIdx, json)
     .then(result => {
-        console.log(result);
         const affectedRows = result.affectedRows;
+        if(affectedRows == 0) throw new NotMatchedError();
         res.status(status.OK)
-        .send(util.successTrue(message.X_UPDATE_SUCCESS(NAME), {affectedRows}));
+        .send(util.successTrue(message.X_UPDATE_SUCCESS(NAME)));
     })
     .catch(err => {
         console.log(err);    
@@ -82,10 +82,10 @@ router.delete('/:articleIdx', (req, res) => {
     if(!articleIdx) throw new ParameterError();
     Article.delete(articleIdx)
     .then(result => {
-        console.log(result);
         const affectedRows = result.affectedRows;
+        if(affectedRows == 0) throw new NotMatchedError();
         res.status(status.OK)
-        .send(util.successTrue(message.X_DELETE_SUCCESS(NAME), {affectedRows}));
+        .send(util.successTrue(message.X_DELETE_SUCCESS(NAME)));
     })
     .catch(err => {
         console.log(err);    
