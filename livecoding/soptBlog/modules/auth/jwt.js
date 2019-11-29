@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const { TokenExpiredError, AuthorizationError } = require('../../errors');
 const {
     secretOrPrivateKey
-} = require('../config/secretKey');
+} = require('../../config/secretKey');
 
 const options = {
     algorithm: "HS256",
