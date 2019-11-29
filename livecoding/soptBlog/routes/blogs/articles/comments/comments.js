@@ -60,10 +60,10 @@ router.put('/:commentIdx', (req, res) => {
     if(!commentIdx || Object.keys(json).length == 0) throw new ParameterError();
     Comment.update(commentIdx, json)
     .then(result => {
-        console.log(result);
         const affectedRows = result.affectedRows;
+        if(affectedRows == 0) throw new NotMatchedError();
         res.status(status.OK)
-        .send(util.successTrue(message.X_UPDATE_SUCCESS(NAME), {affectedRows}));
+        .send(util.successTrue(message.X_UPDATE_SUCCESS(NAME)));
     })
     .catch(err => {
         console.log(err);    
@@ -77,10 +77,10 @@ router.delete('/:commentIdx', (req, res) => {
     if(!commentIdx) throw new ParameterError();
     Comment.delete(commentIdx)
     .then(result => {
-        console.log(result);
         const affectedRows = result.affectedRows;
+        if(affectedRows == 0) throw new NotMatchedError();
         res.status(status.OK)
-        .send(util.successTrue(message.X_DELETE_SUCCESS(NAME), {affectedRows}));
+        .send(util.successTrue(message.X_DELETE_SUCCESS(NAME)));
     })
     .catch(err => {
         console.log(err);    
