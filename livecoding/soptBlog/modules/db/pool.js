@@ -1,5 +1,5 @@
 const poolPromise = require('../../config/dbConfig');
-const { DatabaseError, NoReferencedRowError } = require('../../errors');
+const { DatabaseError, NoReferencedRowError, DuplicatedEntryError } = require('../../errors');
 
 module.exports = {
     queryParam_None: async (query) => {
@@ -13,6 +13,9 @@ module.exports = {
                 connection.rollback(() => {});
                 if(queryError.errno == 1452) {
                     result = new NoReferencedRowError();
+                }
+                else if(queryError.errno == 1062) {
+                    result = new DuplicatedEntryError();
                 }
                 console.log(queryError);
             }
