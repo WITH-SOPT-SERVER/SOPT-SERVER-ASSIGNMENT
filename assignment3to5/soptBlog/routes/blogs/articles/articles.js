@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router({mergeParams: true});
-
-const {util, status, message} = require('../../../modules/utils');
 const { ParameterError, NotMatchedError } = require('../../../errors');
 const upload = require('../../../config/multer');
-
 const Article = require('../../../models/Article');
+const {util, status, message} = require('../../../modules/utils');
+const AuthUtil = require('../../../modules/auth/authUtils');
 
 const NAME = '게시글'
 router.get('/', async (req, res) => {
@@ -40,7 +39,7 @@ router.get('/:articleIdx', (req, res) => {
     });
 });
 
-router.post('/', upload.single('image'), (req, res) => {
+router.post('/', AuthUtil.LoggedIn, upload.single('image'), (req, res) => {
     const { blogIdx } = req.params;
     const { title, content } = req.body;
     const imageUrl = (req.file || {location: null}).location || '';
@@ -58,7 +57,7 @@ router.post('/', upload.single('image'), (req, res) => {
     });
 });
 
-router.put('/:articleIdx', upload.single('image'), (req, res) => {
+router.put('/:articleIdx', AuthUtil.LoggedIn, upload.single('image'), (req, res) => {
     const { articleIdx } = req.params;
     const json = req.body;
     if(req.file) json.imageUrl = req.file.location;
@@ -77,7 +76,7 @@ router.put('/:articleIdx', upload.single('image'), (req, res) => {
     });
 });
 
-router.delete('/:articleIdx', (req, res) => {
+router.delete('/:articleIdx', AuthUtil.LoggedIn, (req, res) => {
     const { articleIdx } = req.params;
     if(!articleIdx) throw new ParameterError();
     Article.delete(articleIdx)
