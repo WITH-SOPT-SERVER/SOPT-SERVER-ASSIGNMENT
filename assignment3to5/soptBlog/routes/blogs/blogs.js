@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router({mergeParams: true});
-const {util, status, message} = require('../../modules/utils');
-const Blog = require('../../models/Blog');
 const { ParameterError, NotMatchedError } = require('../../errors');
+const Blog = require('../../models/Blog');
+const { util, status, message } = require('../../modules/utils');
+const AuthUtil = require('../../modules/auth/authUtils');
 
 const NAME = '블로그'
 router.get('/', async (req, res) => {
@@ -34,7 +35,7 @@ router.get('/:blogIdx', (req, res) => {
     });
 });
 
-router.post('/', (req, res) => {
+router.post('/', AuthUtil.LoggedIn, (req, res) => {
     const { name, host } = req.body;
     if(!name || !host) throw new ParameterError();
     Blog.create({name, host})
@@ -50,7 +51,7 @@ router.post('/', (req, res) => {
     });
 });
 
-router.put('/:blogIdx', (req, res) => {
+router.put('/:blogIdx', AuthUtil.LoggedIn, (req, res) => {
     const { blogIdx } = req.params;
     const json = req.body;
     if(!blogIdx || Object.keys(json).length == 0) throw new ParameterError();
@@ -68,7 +69,7 @@ router.put('/:blogIdx', (req, res) => {
     });
 });
 
-router.delete('/:blogIdx', (req, res) => {
+router.delete('/:blogIdx', AuthUtil.LoggedIn, (req, res) => {
     const { blogIdx } = req.params;
     if(!blogIdx) throw new ParameterError();
     Blog.delete(blogIdx)

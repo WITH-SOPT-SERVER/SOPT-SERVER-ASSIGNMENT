@@ -1,15 +1,17 @@
 const express = require('express');
 const router = express.Router({mergeParams: true});
-const {util, status, message} = require('../../../../modules/utils');
-const Comment = require('../../../../models/Comment');
-const { ParameterError } = require('../../../../errors');
+const { ParameterError, NotMatchedError } = require('../../../errors');
+const upload = require('../../../config/multer');
+const Article = require('../../../models/Article');
+const {util, status, message} = require('../../../modules/utils');
+const AuthUtil = require('../../../modules/auth/authUtils');
 
-const NAME = '댓글'
+const NAME = '게시글'
 router.get('/', async (req, res) => {
-    const { articleIdx } = req.params;
-    if(!articleIdx) throw new ParameterError();
-    // Comment.readByArticleIdx(articleIdx)
-    Comment.readWhere({articleIdx})
+    const { blogIdx } = req.params;
+    if(!blogIdx) throw new ParameterError();
+    // Article.readByBlogIdx(blogIdx)
+    Article.readWhere({blogIdx})
     .then(result => {
         res.status(status.OK)
         .send(util.successTrue(message.X_READ_SUCCESS(NAME), result));
@@ -21,11 +23,11 @@ router.get('/', async (req, res) => {
     })
 });
 
-router.get('/:commentIdx', (req, res) => {
-    const { commentIdx } = req.params;
-    if(!commentIdx) throw new ParameterError();
-    // Comment.readByIdx(commentIdx)
-    Comment.readWhere({commentIdx})
+router.get('/:articleIdx', (req, res) => {
+    const { articleIdx } = req.params;
+    if(!articleIdx) throw new ParameterError();
+    // Article.readByIdx(articleIdx)
+    Article.readWhere({articleIdx})
     .then(result => {
         res.status(status.OK)
         .send(util.successTrue(message.X_READ_SUCCESS(NAME), result));
@@ -37,11 +39,12 @@ router.get('/:commentIdx', (req, res) => {
     });
 });
 
-router.post('/', (req, res) => {
-    const { articleIdx } = req.params;
-    const {  writer, content } = req.body;
-    if(!articleIdx || !writer || !content) throw new ParameterError();
-    Comment.create({articleIdx, writer, content})
+router.post('/', AuthUtil.LoggedIn, upload.single('image'), (req, res) => {
+    const { blogIdx } = req.params;
+    const { title, content } = req.body;
+    const imageUrl = (req.file || {location: null}).location || '';
+    if(!blogIdx || !title || !content) throw new ParameterError();
+    Article.create({blogIdx, title, content, imageUrl})
     .then(result => {
         const insertId = result.insertId;
         res.status(status.OK)
@@ -54,11 +57,12 @@ router.post('/', (req, res) => {
     });
 });
 
-router.put('/:commentIdx', (req, res) => {
-    const { commentIdx } = req.params;
+router.put('/:articleIdx', AuthUtil.LoggedIn, upload.single('image'), (req, res) => {
+    const { articleIdx } = req.params;
     const json = req.body;
-    if(!commentIdx || Object.keys(json).length == 0) throw new ParameterError();
-    Comment.update(commentIdx, json)
+    if(req.file) json.imageUrl = req.file.location;
+    if(!articleIdx || Object.keys(json).length == 0) throw new ParameterError();
+    Article.update(articleIdx, json)
     .then(result => {
         const affectedRows = result.affectedRows;
         if(affectedRows == 0) throw new NotMatchedError();
@@ -72,10 +76,10 @@ router.put('/:commentIdx', (req, res) => {
     });
 });
 
-router.delete('/:commentIdx', (req, res) => {
-    const { commentIdx } = req.params;
-    if(!commentIdx) throw new ParameterError();
-    Comment.delete(commentIdx)
+router.delete('/:articleIdx', AuthUtil.LoggedIn, (req, res) => {
+    const { articleIdx } = req.params;
+    if(!articleIdx) throw new ParameterError();
+    Article.delete(articleIdx)
     .then(result => {
         const affectedRows = result.affectedRows;
         if(affectedRows == 0) throw new NotMatchedError();
